@@ -1,28 +1,30 @@
 const mainUrl = "https://swapi.co/api/planets/";
-let arrDataPlanets;
-let arrDataFilms;
+let dataPlanets;
+let dataFilms;
 
 //logic
 async function loadAndDrawDataFromAPI(mainUrl)  {
-    const res = await getData(mainUrl);
+    getData(mainUrl)
+        .then(res =>  {
+            dataPlanets = res.results;
+            const urlsFilms = searchUrlFilms(dataPlanets);
 
-    arrDataPlanets = res.results;
-
-    const arrUrlFilms = searchUrlFilms(arrDataPlanets);
-    waitAllPromisesInArray(arrUrlFilms)
-        .then(films => editFilmObject(setRelations(films, arrDataPlanets)))
-        .then(res => {
-            arrDataFilms = res;
-            drawHTML(createObjForHMTL(arrDataPlanets, arrDataFilms));
+            waitAllPromisesInArray(urlsFilms)
+                .then(films => editPropsOfObject(setRelations(films, dataPlanets)))
+                .then(res => {
+                    dataFilms = res;
+                    drawHTML(dataPlanets);
+                    drawHTML(dataFilms);
+                });
         })
 }
 
 //api
-async function getData(url) {
+function getData(url) {
 
-    return (fetch(url)
+    return fetch(url)
         .then(result => result.json())
-        .catch(err => console.log("Fetch is RIP")));
+        .catch(res => console.log("Fetch is RIP"));
 }
 
 function searchUrlFilms(arrDataPlanets) {
@@ -39,77 +41,72 @@ function searchUrlFilms(arrDataPlanets) {
     return arrUrlFilms;
 }
 
-async function waitAllPromisesInArray(arrUrlFilms) {
-    const arrDataFilms = [];
+function waitAllPromisesInArray(urlsFilms) {
+    const dataFilms = [];
+    let count;
+    
+    count = urlsFilms.length - 1;
 
-    for (let i = 0; i < arrUrlFilms.length; i++) {
-        arrDataFilms.push(getData(arrUrlFilms[i]));
-    }
-    for(let i = 0; i < arrDataFilms.length; i++) {
-        await arrDataFilms[i].then(value => arrDataFilms[i] = value);
-    }
+    return new Promise( (resolve) => {
 
-    return arrDataFilms;
+        for (let i = 0; i < urlsFilms.length; i++) {
+            getData(urlsFilms[i])
+                .then((res) => {
+                    dataFilms.push(res);
+                    count === 0 ? resolve(dataFilms) : count--;
+                });
+        }
+    });
 }
 
 function setRelations(films, planets) {
     films.forEach( (item, i) => {
-        films[i].idOfPlanets = [];
+        films[i].elementId = [];
         planets.forEach( (value) => {
             if(Object.values(value.films).includes(item.url))
-                films[i].idOfPlanets.push(value.name);
+                films[i].elementId.push(value.name);
         })
     })
 
     return films;
 }
 
-function editFilmObject(arrDataFilms) {    // свойства объектов к одинаковому названию для удобного обращения к ним 
+function editPropsOfObject(arrDataFilms) {    // свойства объектов к одинаковому названию для удобного обращения к ним 
+    const films = arrDataFilms;
+
     arrDataFilms.map((value, index) => {
-        arrDataFilms[index].name = value.title;
-        delete arrDataFilms[index].title;
+        films[index].name = value.title;
+        delete films[index].title;
     })
 
-    return arrDataFilms;
+    return films;
 }
 
-function createObjForHMTL(planets, films) { // общий объект из планет и фильмов для удобного вывода в html
-    let newObj = {};
-
-    planets.map( (value) => {
-        newObj[value.name] = [];
-    })
-    films.map( (item, index) => {
-        item.idOfPlanets.map((oneId) => {
-            newObj[oneId].push(films[index].name);
-        });
-    })
-    
-    return newObj;
-}
-
-//view
-function drawHTML(objForHTML) {
+function drawHTML(data, elemId = ['content']) {
     let newDiv;
-    let newCaption;
-    let newParagraph;
+    let newTextElem;
 
-    Object.keys(objForHTML).forEach((nameOfPlanet) => {
+    data.map( (value) => {
+        
         newDiv = document.createElement("div");
-        newDiv.classList.add("card");
-        newDiv.setAttribute('id', nameOfPlanet);
-        newCaption = document.createElement("h2");
-        newCaption.textContent = nameOfPlanet;
-        newCaption.classList.add("card-head");
-        document.getElementById("content").appendChild(newDiv);
-        document.getElementById(nameOfPlanet).appendChild(newCaption);
-        objForHTML[nameOfPlanet].forEach((film) => {                     // старт вывода фильмов к планетам
-            newParagraph = document.createElement('p');
-            newParagraph.textContent = film;
-            newParagraph.classList.add("card-column");
-            document.getElementById(nameOfPlanet).appendChild(newParagraph).node;
-        });
-    });
+        newTextElem = document.createElement('p');
+
+        if (value.hasOwnProperty("elementId")) {
+            elemId = value.elementId;
+            newTextElem.classList.add("card-column");
+        }
+        else {
+            newDiv.classList.add("card");
+            newTextElem.classList.add("card-head");
+        }
+
+        newDiv.setAttribute('id', value.name);
+        newTextElem.textContent = value.name;
+        newDiv.appendChild(newTextElem);
+        elemId.map( (oneId) => {
+            document.getElementById(oneId).appendChild(newDiv.cloneNode(true));
+        })
+    })
 }
 
 loadAndDrawDataFromAPI(mainUrl);
