@@ -133,3 +133,7 @@ body {
 .not-display {
     display: none;
 }
+
+.flex {
+    display: flex;
+}
