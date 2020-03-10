@@ -1,7 +1,6 @@
-const mainUrl = "https://swapi.co/api/planets/";
-let dataPlanets = [];
-let dataFilms = [];
+import {getData, searchUrlFilms, waitAllPromisesInArray, setRelations, addPropsPlanets, addPropsFilms, drawHTML} from './api.js';
 
+const mainUrl = "https://swapi.co/api/planets/";
 //logic
 
 /**
@@ -12,19 +11,17 @@ let dataFilms = [];
 function loadAndDrawDataFromAPI(mainUrl)  {
     getData(mainUrl)
         .then(res =>  {
-            dataPlanets = res.results;
+            let dataPlanets = res.results;
             const urlsFilms = searchUrlFilms(dataPlanets);
-            dataPlanets = addPropsPlanets(dataPlanets);
+            let toDrawPlanets = addPropsPlanets(dataPlanets);
 
             waitAllPromisesInArray(urlsFilms)
                 .then(films => addPropsFilms(setRelations(films, dataPlanets)))
-                .then(res => {
-                    dataFilms = res;
-                    drawHTML(dataPlanets);
+                .then(dataFilms => {
+                    drawHTML(toDrawPlanets);
                     drawHTML(dataFilms);
                 });
         })
 }
 
-import {getData, searchUrlFilms, waitAllPromisesInArray, setRelations, addPropsPlanets, addPropsFilms, drawHTML} from './api.js';
 export {loadAndDrawDataFromAPI, mainUrl};

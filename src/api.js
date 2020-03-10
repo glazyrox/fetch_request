@@ -1,3 +1,5 @@
+import {drawHTML} from './view.js';
+
 /**
   * Загружает данные с API в промис
   * 
@@ -63,9 +65,12 @@ function waitAllPromisesInArray(urlsFilms) {
   * @return {array} измененные данные фильмов
   */
 function setRelations(films, planets) {
-    let newFilms = films;
-    newFilms.forEach( (item, i) => {
+    let newFilms = [];
+
+    films.forEach( (item, i) => {
+        newFilms.push({});
         newFilms[i].elementId = [];
+        newFilms[i].title = item.title;
         planets.forEach( (value) => {
             if (Object.values(value.films).includes(item.url))
                 newFilms[i].elementId.push(value.name);
@@ -79,13 +84,14 @@ function setRelations(films, planets) {
   * Добавляет новые свойства в планеты для удобного вывода
   *
   * @param {array} dataPlanets данные планет
-  * @return {array} новые данные планет
+  * @return {array} отредактированный массив с данными планет
   */
 function addPropsPlanets(dataPlanets) {
     let data = [];
 
-    data = dataPlanets;
-    data.map( (value, index) => {
+    dataPlanets.map( (value, index) => {
+        data.push({});
+        data[index].name = value.name;
         data[index].elementId = ['content'];
     })
 
@@ -99,15 +105,15 @@ function addPropsPlanets(dataPlanets) {
   * @return {array} новые данные фильмов
   */
 function addPropsFilms(dataFilms) {
-    const data = dataFilms;
+    const data = [];
 
     dataFilms.map((value, index) => {
+        data.push({});
         data[index].name = value.title;
-        delete data[index].title;
+        data[index].elementId = value.elementId;
     })
 
     return data;
 }
 
-import {drawHTML} from './view.js';
 export {getData, searchUrlFilms, waitAllPromisesInArray, setRelations, addPropsPlanets, addPropsFilms, drawHTML};
