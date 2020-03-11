@@ -13,15 +13,7 @@
         newDiv.setAttribute('id', value.name);
         newTextElem.textContent = value.name;
         newDiv.appendChild(newTextElem);
-        
-        if (value.elementId[0] === 'content') {
-            newDiv.classList = 'card';
-            newTextElem.classList = 'card-head';
-        }
-        else {
-            newTextElem.classList = 'card-column';
-        }
-
+        newDiv.classList = value.class;
         value.elementId.map( (oneId) => {
             document.getElementById(oneId).appendChild(newDiv.cloneNode(true));
         })

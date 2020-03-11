@@ -89,19 +89,32 @@ body {
     padding: 0.5% 2.5% 0 2.5%;
     background-color: lightgray;
     border: 0.5px solid black;
+    padding-bottom: 1%;
 }
 
-.card-head {
+.card p {
     margin: 0;
-    padding: 0;
     text-align: center;
     font-weight: bold;
-    border-bottom: 0.5px solid black;
+    padding-bottom: 2.5%;
+    font-size: 1.5em;
+    text-decoration: underline;
 }
 
+
 .card-column {
+    margin-bottom: 3%;
     background-color: white;
     border: 0.5px solid gray;
+}
+
+.card-column p {
+    margin: 2%;
+    padding: 0;
+    font-size: 1em;
+    font-weight: normal;
+    text-decoration: none;
+    border-bottom: none;
 }
 
 /* footer */

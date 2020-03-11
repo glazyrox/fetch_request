@@ -93,6 +93,7 @@ function addPropsPlanets(dataPlanets) {
         data.push({});
         data[index].name = value.name;
         data[index].elementId = ['content'];
+        data[index].class = 'card';
     })
 
     return data;
@@ -111,6 +112,7 @@ function addPropsFilms(dataFilms) {
         data.push({});
         data[index].name = value.title;
         data[index].elementId = value.elementId;
+        data[index].class = 'card-column';
     })
 
     return data;
